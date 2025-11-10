@@ -1,7 +1,7 @@
 import type { Media } from '@/payload-types'
 
-export const image2: Omit<Media, 'createdAt' | 'id' | 'updatedAt'> = {
-  alt: 'Curving abstract shapes with an orange and blue gradient',
+export const image1: Omit<Media, 'createdAt' | 'id' | 'updatedAt'> = {
+  alt: 'A placeholder image',
   caption: {
     root: {
       type: 'root',
@@ -27,7 +27,7 @@ export const image2: Omit<Media, 'createdAt' | 'id' | 'updatedAt'> = {
                   format: 0,
                   mode: 'normal',
                   style: '',
-                  text: 'Andrew Kliatskyi',
+                  text: 'Photographer',
                   version: 1,
                 },
               ],
@@ -35,20 +35,11 @@ export const image2: Omit<Media, 'createdAt' | 'id' | 'updatedAt'> = {
               fields: {
                 linkType: 'custom',
                 newTab: true,
-                url: 'https://unsplash.com/@kirp',
+                url: 'https://example.com/',
               },
               format: '',
               indent: 0,
               version: 2,
-            },
-            {
-              type: 'text',
-              detail: 0,
-              format: 0,
-              mode: 'normal',
-              style: '',
-              text: ' on Unsplash.',
-              version: 1,
             },
           ],
           direction: 'ltr',
