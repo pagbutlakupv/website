@@ -3,12 +3,12 @@ import type { CollectionSlug, GlobalSlug, Payload, PayloadRequest, File } from '
 import { contactForm as contactFormData } from './contact-form'
 import { contact as contactPageData } from './contact-page'
 import { home } from './home'
-import { image1 } from './image-1'
-import { image2 } from './image-2'
-import { imageHero1 } from './image-hero-1'
+import { image1 } from './image'
 import { post1 } from './post-1'
 import { post2 } from './post-2'
 import { post3 } from './post-3'
+import path from 'path'
+import fs from 'fs'
 
 const collections: CollectionSlug[] = [
   'categories',
@@ -83,49 +83,21 @@ export const seed = async ({
 
   payload.logger.info(`— Seeding media...`)
 
-  const [image1Buffer, image2Buffer, image3Buffer, hero1Buffer] = await Promise.all([
-    fetchFileByURL(
-      'https://raw.githubusercontent.com/payloadcms/payload/refs/heads/main/templates/website/src/endpoints/seed/image-post1.webp',
-    ),
-    fetchFileByURL(
-      'https://raw.githubusercontent.com/payloadcms/payload/refs/heads/main/templates/website/src/endpoints/seed/image-post2.webp',
-    ),
-    fetchFileByURL(
-      'https://raw.githubusercontent.com/payloadcms/payload/refs/heads/main/templates/website/src/endpoints/seed/image-post3.webp',
-    ),
-    fetchFileByURL(
-      'https://raw.githubusercontent.com/payloadcms/payload/refs/heads/main/templates/website/src/endpoints/seed/image-hero1.webp',
-    ),
-  ])
+  const image = loadLocalFile('image.jpg')
 
-  const [demoAuthor, image1Doc, image2Doc, image3Doc, imageHomeDoc] = await Promise.all([
+  const [demoAuthor, imageDoc] = await Promise.all([
     payload.create({
       collection: 'users',
       data: {
         name: 'Demo Author',
         email: 'demo-author@example.com',
-        password: 'password',
+        password: 'demo-password',
       },
     }),
     payload.create({
       collection: 'media',
       data: image1,
-      file: image1Buffer,
-    }),
-    payload.create({
-      collection: 'media',
-      data: image2,
-      file: image2Buffer,
-    }),
-    payload.create({
-      collection: 'media',
-      data: image2,
-      file: image3Buffer,
-    }),
-    payload.create({
-      collection: 'media',
-      data: imageHero1,
-      file: hero1Buffer,
+      file: image,
     }),
     categories.map((category) =>
       payload.create({
@@ -148,7 +120,7 @@ export const seed = async ({
     context: {
       disableRevalidate: true,
     },
-    data: post1({ heroImage: image1Doc, blockImage: image2Doc, author: demoAuthor }),
+    data: post1({ heroImage: imageDoc, blockImage: imageDoc, author: demoAuthor }),
   })
 
   const post2Doc = await payload.create({
@@ -157,7 +129,7 @@ export const seed = async ({
     context: {
       disableRevalidate: true,
     },
-    data: post2({ heroImage: image2Doc, blockImage: image3Doc, author: demoAuthor }),
+    data: post2({ heroImage: imageDoc, blockImage: imageDoc, author: demoAuthor }),
   })
 
   const post3Doc = await payload.create({
@@ -166,7 +138,7 @@ export const seed = async ({
     context: {
       disableRevalidate: true,
     },
-    data: post3({ heroImage: image3Doc, blockImage: image1Doc, author: demoAuthor }),
+    data: post3({ heroImage: imageDoc, blockImage: imageDoc, author: demoAuthor }),
   })
 
   // update each post with related posts
@@ -206,7 +178,7 @@ export const seed = async ({
     payload.create({
       collection: 'pages',
       depth: 0,
-      data: home({ heroImage: imageHomeDoc, metaImage: image2Doc }),
+      data: home({ heroImage: imageDoc, metaImage: imageDoc }),
     }),
     payload.create({
       collection: 'pages',
@@ -258,15 +230,7 @@ export const seed = async ({
               type: 'custom',
               label: 'Source Code',
               newTab: true,
-              url: 'https://github.com/payloadcms/payload/tree/main/templates/website',
-            },
-          },
-          {
-            link: {
-              type: 'custom',
-              label: 'Payload',
-              newTab: true,
-              url: 'https://payloadcms.com/',
+              url: 'https://github.com/pagbutlakupv/website',
             },
           },
         ],
@@ -277,22 +241,17 @@ export const seed = async ({
   payload.logger.info('Seeded database successfully!')
 }
 
-async function fetchFileByURL(url: string): Promise<File> {
-  const res = await fetch(url, {
-    credentials: 'include',
-    method: 'GET',
-  })
-
-  if (!res.ok) {
-    throw new Error(`Failed to fetch file from ${url}, status: ${res.status}`)
-  }
-
-  const data = await res.arrayBuffer()
+function loadLocalFile(fileName: string): File {
+  const seedDir = path.join(process.cwd(), 'src', 'endpoints', 'seed')
+  const filePath = path.join(seedDir, fileName)
+  const data = fs.readFileSync(filePath)
+  const ext = fileName.split('.').pop()
+  const mime = ext === 'jpg' ? 'image/jpeg' : `image/${ext}`
 
   return {
-    name: url.split('/').pop() || `file-${Date.now()}`,
-    data: Buffer.from(data),
-    mimetype: `image/${url.split('.').pop()}`,
+    name: `${Date.now()}-${fileName}`,
+    data,
+    mimetype: mime,
     size: data.byteLength,
   }
 }
