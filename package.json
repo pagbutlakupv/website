@@ -20,7 +20,8 @@
     "test": "pnpm run test:int && pnpm run test:e2e",
     "test:e2e": "cross-env NODE_OPTIONS=\"--no-deprecation --no-experimental-strip-types\" pnpm exec playwright test --config=playwright.config.ts",
     "test:int": "cross-env NODE_OPTIONS=--no-deprecation vitest run --config ./vitest.config.mts",
-    "prepare": "husky"
+    "prepare": "husky",
+    "commit": "commit"
   },
   "dependencies": {
     "@payloadcms/admin-bar": "3.62.0",
@@ -60,6 +61,9 @@
     "tailwindcss-animate": "^1.0.7"
   },
   "devDependencies": {
+    "@commitlint/cli": "^20.1.0",
+    "@commitlint/config-conventional": "^20.0.0",
+    "@commitlint/prompt-cli": "^20.1.0",
     "@eslint/eslintrc": "^3.2.0",
     "@playwright/test": "1.54.1",
     "@tailwindcss/typography": "^0.5.13",
