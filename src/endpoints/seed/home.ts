@@ -28,8 +28,8 @@ export const home: (args: HomeArgs) => RequiredDataFromCollectionSlug<'pages'> =
           link: {
             type: 'custom',
             appearance: 'outline',
-            label: 'Contact',
-            url: '/contact',
+            label: 'Admin',
+            url: '/admin',
           },
         },
       ],
