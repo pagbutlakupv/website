@@ -1,8 +1,6 @@
 import type { Metadata } from 'next'
 
 import { cn } from '@/utilities/ui'
-import { GeistMono } from 'geist/font/mono'
-import { GeistSans } from 'geist/font/sans'
 import React from 'react'
 
 import { AdminBar } from '@/components/AdminBar'
@@ -16,11 +14,35 @@ import { draftMode } from 'next/headers'
 import './globals.css'
 import { getServerSideURL } from '@/utilities/getURL'
 
+import { Noto_Serif, Noto_Sans, Noto_Sans_Mono } from 'next/font/google'
+
+const notoSerif = Noto_Serif({
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-noto-serif',
+})
+
+const notoSans = Noto_Sans({
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-noto-sans',
+})
+
+const notoMono = Noto_Sans_Mono({
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-noto-mono',
+})
+
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const { isEnabled } = await draftMode()
 
   return (
-    <html className={cn(GeistSans.variable, GeistMono.variable)} lang="en" suppressHydrationWarning>
+    <html
+      className={cn(notoSerif.variable, notoSans.variable, notoMono.variable)}
+      lang="en"
+      suppressHydrationWarning
+    >
       <head>
         <InitTheme />
         <link href="/favicon.ico" rel="icon" sizes="32x32" />
