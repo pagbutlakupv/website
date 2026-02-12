@@ -44,13 +44,6 @@ This project is the official website for the student and community publication o
    docker-compose up
    ```
 
-   If all else fails do:
-   ```bash
-   docker-compose down
-   docker network rm pagbutlakupv_default
-   docker-compose up -d --build
-    ```
-
 ### Usage
 
 1. Open [http://localhost:3000](http://localhost:3000) to open the app in your browser
