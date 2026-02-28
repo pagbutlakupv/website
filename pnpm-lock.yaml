@@ -175,7 +175,7 @@ importers:
         specifier: ^16.3.0
         version: 16.3.0
       playwright:
-        specifier: ^1.58.2
+        specifier: 1.58.2
         version: 1.58.2
       playwright-core:
         specifier: 1.58.2
