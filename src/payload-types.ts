@@ -237,8 +237,25 @@ export interface Page {
  */
 export interface Post {
   id: number;
+  /**
+   * Use the reader-facing headline for the story.
+   */
   title: string;
+  /**
+   * A one or two sentence standfirst that sits under the headline.
+   */
+  dek?: string | null;
+  /**
+   * Short summary used in story cards, search, and future homepage story rails.
+   */
+  excerpt?: string | null;
+  /**
+   * Upload the main image that introduces the story.
+   */
   heroImage?: (number | null) | Media;
+  /**
+   * Write the full article here. Use blocks only when the story needs them.
+   */
   content: {
     root: {
       type: string;
@@ -254,8 +271,16 @@ export interface Post {
     };
     [k: string]: unknown;
   };
-  relatedPosts?: (number | Post)[] | null;
-  categories?: (number | Category)[] | null;
+  /**
+   * Optional reporting sources, references, or follow-up links.
+   */
+  sourceLinks?:
+    | {
+        label: string;
+        url: string;
+        id?: string | null;
+      }[]
+    | null;
   meta?: {
     title?: string | null;
     /**
@@ -264,7 +289,34 @@ export interface Post {
     image?: (number | null) | Media;
     description?: string | null;
   };
+  /**
+   * Classify the story so editors can sort and feature it quickly.
+   */
+  articleType: 'news' | 'feature' | 'analysis' | 'opinion' | 'editorial';
+  /**
+   * Use this to track editorial progress before the story is published.
+   */
+  workflowStage: 'drafting' | 'in-review' | 'ready-for-edit' | 'ready-to-publish' | 'published';
+  /**
+   * Flag urgent coverage so it can be prioritized on the homepage later.
+   */
+  breaking?: boolean | null;
+  /**
+   * Mark stories editors want to surface in featured story modules.
+   */
+  featured?: boolean | null;
+  /**
+   * Choose the section or desk this story belongs to.
+   */
+  categories?: (number | Category)[] | null;
+  /**
+   * Link related coverage for readers who want follow-up context.
+   */
+  relatedPosts?: (number | Post)[] | null;
   publishedAt?: string | null;
+  /**
+   * Defaults to the current journalist. Editors can assign multiple bylines.
+   */
   authors?: (number | User)[] | null;
   populatedAuthors?:
     | {
@@ -431,6 +483,10 @@ export interface Category {
 export interface User {
   id: number;
   name?: string | null;
+  /**
+   * Journalists can draft stories, editors can prepare and publish, and admins manage the newsroom.
+   */
+  role: 'journalist' | 'editor' | 'admin';
   updatedAt: string;
   createdAt: string;
   email: string;
@@ -839,6 +895,7 @@ export interface Search {
     relationTo: 'posts';
     value: number | Post;
   };
+  excerpt?: string | null;
   slug?: string | null;
   meta?: {
     title?: string | null;
@@ -1195,10 +1252,17 @@ export interface FormBlockSelect<T extends boolean = true> {
  */
 export interface PostsSelect<T extends boolean = true> {
   title?: T;
+  dek?: T;
+  excerpt?: T;
   heroImage?: T;
   content?: T;
-  relatedPosts?: T;
-  categories?: T;
+  sourceLinks?:
+    | T
+    | {
+        label?: T;
+        url?: T;
+        id?: T;
+      };
   meta?:
     | T
     | {
@@ -1206,6 +1270,12 @@ export interface PostsSelect<T extends boolean = true> {
         image?: T;
         description?: T;
       };
+  articleType?: T;
+  workflowStage?: T;
+  breaking?: T;
+  featured?: T;
+  categories?: T;
+  relatedPosts?: T;
   publishedAt?: T;
   authors?: T;
   populatedAuthors?:
@@ -1340,6 +1410,7 @@ export interface CategoriesSelect<T extends boolean = true> {
  */
 export interface UsersSelect<T extends boolean = true> {
   name?: T;
+  role?: T;
   updatedAt?: T;
   createdAt?: T;
   email?: T;
@@ -1530,6 +1601,7 @@ export interface SearchSelect<T extends boolean = true> {
   title?: T;
   priority?: T;
   doc?: T;
+  excerpt?: T;
   slug?: T;
   meta?:
     | T
