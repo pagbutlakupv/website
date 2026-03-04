@@ -11,10 +11,12 @@ import {
 
 import { authenticated } from '../../access/authenticated'
 import { authenticatedOrPublished } from '../../access/authenticatedOrPublished'
+import { getUserRole } from '../../access/roles'
 import { Banner } from '../../blocks/Banner/config'
 import { Code } from '../../blocks/Code/config'
 import { MediaBlock } from '../../blocks/MediaBlock/config'
 import { generatePreviewPath } from '../../utilities/generatePreviewPath'
+import { enforceEditorialWorkflow } from './hooks/enforceEditorialWorkflow'
 import { populateAuthors } from './hooks/populateAuthors'
 import { revalidateDelete, revalidatePost } from './hooks/revalidatePost'
 
@@ -31,7 +33,15 @@ export const Posts: CollectionConfig<'posts'> = {
   slug: 'posts',
   access: {
     create: authenticated,
-    delete: authenticated,
+    delete: ({ req: { user } }) => {
+      if (!user) {
+        return false
+      }
+
+      const role = getUserRole(user)
+
+      return role === 'editor' || role === 'admin'
+    },
     read: authenticatedOrPublished,
     update: authenticated,
   },
@@ -40,6 +50,8 @@ export const Posts: CollectionConfig<'posts'> = {
   // Type safe if the collection slug generic is passed to `CollectionConfig` - `CollectionConfig<'posts'>
   defaultPopulate: {
     title: true,
+    excerpt: true,
+    articleType: true,
     slug: true,
     categories: true,
     meta: {
@@ -48,7 +60,7 @@ export const Posts: CollectionConfig<'posts'> = {
     },
   },
   admin: {
-    defaultColumns: ['title', 'slug', 'updatedAt'],
+    defaultColumns: ['title', 'workflowStage', 'articleType', 'updatedAt'],
     livePreview: {
       url: ({ data, req }) =>
         generatePreviewPath({
@@ -69,6 +81,10 @@ export const Posts: CollectionConfig<'posts'> = {
     {
       name: 'title',
       type: 'text',
+      label: 'Headline',
+      admin: {
+        description: 'Use the reader-facing headline for the story.',
+      },
       required: true,
     },
     {
@@ -77,8 +93,29 @@ export const Posts: CollectionConfig<'posts'> = {
         {
           fields: [
             {
+              name: 'dek',
+              type: 'textarea',
+              label: 'Dek',
+              admin: {
+                description: 'A one or two sentence standfirst that sits under the headline.',
+              },
+            },
+            {
+              name: 'excerpt',
+              type: 'textarea',
+              label: 'Excerpt',
+              admin: {
+                description:
+                  'Short summary used in story cards, search, and future homepage story rails.',
+              },
+            },
+            {
               name: 'heroImage',
               type: 'upload',
+              label: 'Lead image',
+              admin: {
+                description: 'Upload the main image that introduces the story.',
+              },
               relationTo: 'media',
             },
             {
@@ -96,41 +133,39 @@ export const Posts: CollectionConfig<'posts'> = {
                   ]
                 },
               }),
-              label: false,
+              label: 'Article body',
+              admin: {
+                description: 'Write the full article here. Use blocks only when the story needs them.',
+              },
               required: true,
             },
           ],
-          label: 'Content',
+          label: 'Story',
         },
         {
           fields: [
             {
-              name: 'relatedPosts',
-              type: 'relationship',
+              name: 'sourceLinks',
+              type: 'array',
               admin: {
-                position: 'sidebar',
+                description: 'Optional reporting sources, references, or follow-up links.',
+                initCollapsed: true,
               },
-              filterOptions: ({ id }) => {
-                return {
-                  id: {
-                    not_in: [id],
-                  },
-                }
-              },
-              hasMany: true,
-              relationTo: 'posts',
-            },
-            {
-              name: 'categories',
-              type: 'relationship',
-              admin: {
-                position: 'sidebar',
-              },
-              hasMany: true,
-              relationTo: 'categories',
+              fields: [
+                {
+                  name: 'label',
+                  type: 'text',
+                  required: true,
+                },
+                {
+                  name: 'url',
+                  type: 'text',
+                  required: true,
+                },
+              ],
             },
           ],
-          label: 'Meta',
+          label: 'Reporting',
         },
         {
           name: 'meta',
@@ -162,6 +197,115 @@ export const Posts: CollectionConfig<'posts'> = {
       ],
     },
     {
+      name: 'articleType',
+      type: 'select',
+      defaultValue: 'news',
+      admin: {
+        position: 'sidebar',
+        description: 'Classify the story so editors can sort and feature it quickly.',
+      },
+      options: [
+        {
+          label: 'News',
+          value: 'news',
+        },
+        {
+          label: 'Feature',
+          value: 'feature',
+        },
+        {
+          label: 'Analysis',
+          value: 'analysis',
+        },
+        {
+          label: 'Opinion',
+          value: 'opinion',
+        },
+        {
+          label: 'Editorial',
+          value: 'editorial',
+        },
+      ],
+      required: true,
+    },
+    {
+      name: 'workflowStage',
+      type: 'select',
+      defaultValue: 'drafting',
+      admin: {
+        position: 'sidebar',
+        description: 'Use this to track editorial progress before the story is published.',
+      },
+      options: [
+        {
+          label: 'Drafting',
+          value: 'drafting',
+        },
+        {
+          label: 'In Review',
+          value: 'in-review',
+        },
+        {
+          label: 'Ready for Edit',
+          value: 'ready-for-edit',
+        },
+        {
+          label: 'Ready to Publish',
+          value: 'ready-to-publish',
+        },
+        {
+          label: 'Published',
+          value: 'published',
+        },
+      ],
+      required: true,
+    },
+    {
+      name: 'breaking',
+      type: 'checkbox',
+      label: 'Breaking story',
+      admin: {
+        position: 'sidebar',
+        description: 'Flag urgent coverage so it can be prioritized on the homepage later.',
+      },
+    },
+    {
+      name: 'featured',
+      type: 'checkbox',
+      label: 'Feature on homepage',
+      admin: {
+        position: 'sidebar',
+        description: 'Mark stories editors want to surface in featured story modules.',
+      },
+    },
+    {
+      name: 'categories',
+      type: 'relationship',
+      admin: {
+        position: 'sidebar',
+        description: 'Choose the section or desk this story belongs to.',
+      },
+      hasMany: true,
+      relationTo: 'categories',
+    },
+    {
+      name: 'relatedPosts',
+      type: 'relationship',
+      admin: {
+        position: 'sidebar',
+        description: 'Link related coverage for readers who want follow-up context.',
+      },
+      filterOptions: ({ id }) => {
+        return {
+          id: {
+            not_in: [id],
+          },
+        }
+      },
+      hasMany: true,
+      relationTo: 'posts',
+    },
+    {
       name: 'publishedAt',
       type: 'date',
       admin: {
@@ -186,6 +330,7 @@ export const Posts: CollectionConfig<'posts'> = {
       type: 'relationship',
       admin: {
         position: 'sidebar',
+        description: 'Defaults to the current journalist. Editors can assign multiple bylines.',
       },
       hasMany: true,
       relationTo: 'users',
@@ -217,6 +362,7 @@ export const Posts: CollectionConfig<'posts'> = {
     slugField(),
   ],
   hooks: {
+    beforeChange: [enforceEditorialWorkflow],
     afterChange: [revalidatePost],
     afterRead: [populateAuthors],
     afterDelete: [revalidateDelete],

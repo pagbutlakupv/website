@@ -88,6 +88,7 @@ export const seed = async ({
       collection: 'users',
       data: {
         name: 'Demo Author',
+        role: 'admin',
         email: 'demo-author@example.com',
         password: 'demo-password',
       },
