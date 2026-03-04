@@ -9,6 +9,8 @@ export const post2: (args: PostArgs) => RequiredDataFromCollectionSlug<'posts'> 
   return {
     slug: 'global-gaze',
     _status: 'published',
+    articleType: 'feature',
+    workflowStage: 'published',
     authors: [author],
     content: {
       root: {
