@@ -23,6 +23,7 @@ export default async function Page({ searchParams: searchParamsPromise }: Args) 
     limit: 12,
     select: {
       title: true,
+      excerpt: true,
       slug: true,
       categories: true,
       meta: true,
@@ -35,6 +36,11 @@ export default async function Page({ searchParams: searchParamsPromise }: Args) 
             or: [
               {
                 title: {
+                  like: query,
+                },
+              },
+              {
+                excerpt: {
                   like: query,
                 },
               },
