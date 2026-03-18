@@ -6,7 +6,7 @@ import { getPayload } from 'payload'
 import React from 'react'
 import { Search } from '@/search/Component'
 import PageClient from './page.client'
-import { CardPostData } from '@/components/Card'
+import { CardPostData } from '@/utilities/cardPostData'
 
 type Args = {
   searchParams: Promise<{
@@ -26,6 +26,9 @@ export default async function Page({ searchParams: searchParamsPromise }: Args) 
       slug: true,
       categories: true,
       meta: true,
+      populatedAuthors: true,
+      publishedAt: true,
+      readingTimeMinutes: true,
     },
     // pagination: false reduces overhead if you don't need totalDocs
     pagination: false,

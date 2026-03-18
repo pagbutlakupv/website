@@ -845,6 +845,14 @@ export interface Search {
     description?: string | null;
     image?: (number | null) | Media;
   };
+  publishedAt?: string | null;
+  populatedAuthors?:
+    | {
+        id?: string | null;
+        name?: string | null;
+      }[]
+    | null;
+  readingTimeMinutes?: number | null;
   categories?:
     | {
         relationTo?: string | null;
@@ -1538,6 +1546,14 @@ export interface SearchSelect<T extends boolean = true> {
         description?: T;
         image?: T;
       };
+  publishedAt?: T;
+  populatedAuthors?:
+    | T
+    | {
+        id?: T;
+        name?: T;
+      };
+  readingTimeMinutes?: T;
   categories?:
     | T
     | {

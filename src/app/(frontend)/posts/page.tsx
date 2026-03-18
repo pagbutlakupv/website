@@ -20,10 +20,13 @@ export default async function Page() {
     limit: 12,
     overrideAccess: false,
     select: {
+      content: true,
       title: true,
       slug: true,
       categories: true,
       meta: true,
+      populatedAuthors: true,
+      publishedAt: true,
     },
   })
 

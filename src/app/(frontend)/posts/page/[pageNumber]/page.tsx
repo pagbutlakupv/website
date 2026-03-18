@@ -31,6 +31,15 @@ export default async function Page({ params: paramsPromise }: Args) {
     limit: 12,
     page: sanitizedPageNumber,
     overrideAccess: false,
+    select: {
+      content: true,
+      title: true,
+      slug: true,
+      categories: true,
+      meta: true,
+      populatedAuthors: true,
+      publishedAt: true,
+    },
   })
 
   return (
