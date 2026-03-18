@@ -48,7 +48,7 @@ export default async function ArticlePage({ params: paramsPromise }: Args) {
   if (!article) return <PayloadRedirects url={url} />
 
   return (
-    <article className="pt-16 pb-16">
+    <article className="pt-12 pb-16">
       <PageClient />
 
       {/* Allows redirects for valid pages too */}
@@ -56,24 +56,25 @@ export default async function ArticlePage({ params: paramsPromise }: Args) {
 
       {draft && <LivePreviewListener />}
 
-      <ArticleHero article={article} />
-
-      <div className="flex flex-col items-center gap-4 pt-8">
-        <div className="container">
-          <RichText className="max-w-[48rem] mx-auto" data={article.content} enableGutter={false} />
-          {article.relatedArticles && article.relatedArticles.length > 0 && (
-            <div className="mx-4 my-16 border-t border-border py-8 md:mx-8 lg:mx-12">
-              <h2 className="mb-4 text-lg font-semibold">Related Articles</h2>
-              <RelatedArticles
-                docs={article.relatedArticles.filter(
-                  (relatedArticle) => typeof relatedArticle === 'object',
-                )}
-              />
-            </div>
-          )}
-          <SocialMediaShare title={article.title} url={shareURL} />
-        </div>
+      {/* Main content */}
+      <div className="max-w-[48rem] mx-auto px-4 md:px-6">
+        <ArticleHero article={article} />
+        <RichText data={article.content} enableGutter={false} />
       </div>
+
+      {/* Related articles */}
+      {article.relatedArticles && article.relatedArticles.length > 0 && (
+        <div className="mx-4 md:mx-8 lg:mx-12 my-16 py-8 border-t border-border">
+          <h2 className="text-lg font-semibold mb-4">Related Articles</h2>
+          <RelatedArticles
+            docs={article.relatedArticles.filter(
+              (relatedArticle) => typeof relatedArticle === 'object',
+            )}
+          />
+        </div>
+      )}
+
+      <SocialMediaShare title={article.title} url={shareURL} />
     </article>
   )
 }
