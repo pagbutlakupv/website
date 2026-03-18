@@ -44,6 +44,7 @@ export const Articles: CollectionConfig<'articles'> = {
     title: true,
     slug: true,
     categories: true,
+    content: true,
     meta: {
       image: true,
       description: true,
