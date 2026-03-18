@@ -1,4 +1,6 @@
-import { Post } from '@/payload-types'
+type AuthorLike = {
+  name?: string | null
+}
 
 /**
  * Formats an array of populatedAuthors from Posts into a prettified string.
@@ -11,7 +13,7 @@ import { Post } from '@/payload-types'
  *
  */
 export const formatAuthors = (
-  authors: NonNullable<NonNullable<Post['populatedAuthors']>[number]>[],
+  authors: AuthorLike[],
 ) => {
   // Ensure we don't have any authors without a name
   const authorNames = authors.map((author) => author.name).filter(Boolean)
