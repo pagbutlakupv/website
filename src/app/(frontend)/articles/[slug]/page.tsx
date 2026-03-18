@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 
 import { RelatedArticles } from '@/blocks/RelatedArticles/Component'
 import { PayloadRedirects } from '@/components/PayloadRedirects'
+import { SocialMediaShare } from '@/components/SocialMediaShare'
 import configPromise from '@payload-config'
 import { getPayload } from 'payload'
 import { draftMode } from 'next/headers'
@@ -10,6 +11,7 @@ import RichText from '@/components/RichText'
 
 import { ArticleHero } from '@/heros/ArticleHero'
 import { generateMeta } from '@/utilities/generateMeta'
+import { getServerSideURL } from '@/utilities/getURL'
 import PageClient from './page.client'
 import { LivePreviewListener } from '@/components/LivePreviewListener'
 
@@ -45,6 +47,7 @@ export default async function ArticlePage({ params: paramsPromise }: Args) {
   // Decode to support slugs with special characters
   const decodedSlug = decodeURIComponent(slug)
   const url = '/articles/' + decodedSlug
+  const shareURL = `${getServerSideURL()}${url}`
   const article = await queryArticleBySlug({ slug: decodedSlug })
 
   if (!article) return <PayloadRedirects url={url} />
@@ -71,6 +74,7 @@ export default async function ArticlePage({ params: paramsPromise }: Args) {
               )}
             />
           )}
+          <SocialMediaShare title={article.title} url={shareURL} />
         </div>
       </div>
     </article>
