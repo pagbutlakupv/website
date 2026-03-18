@@ -1,73 +1,70 @@
-import { formatDateTime } from 'src/utilities/formatDateTime'
 import React from 'react'
-
 import type { Article } from '@/payload-types'
-
 import { Media } from '@/components/Media'
 import { formatAuthors } from '@/utilities/formatAuthors'
+import { formatReadableDate } from '@/utilities/formatReadableDate'
+import { Badge } from '@/components/ui/badge'
 
 export const ArticleHero: React.FC<{
   article: Article
 }> = ({ article }) => {
-  const { categories, heroImage, populatedAuthors, publishedAt, title } = article
+  const { categories, heroImage, populatedAuthors, publishedAt, updatedAt, title } = article
 
   const hasAuthors =
     populatedAuthors && populatedAuthors.length > 0 && formatAuthors(populatedAuthors) !== ''
 
+  const publishedDate = publishedAt ? formatReadableDate(publishedAt) : null
+  const updatedDate = updatedAt ? formatReadableDate(updatedAt) : null
+  const showUpdated = updatedDate && updatedDate !== publishedDate
+
   return (
-    <div className="relative -mt-[10.4rem] flex items-end text-background dark:text-foreground">
-      <div className="container z-10 relative lg:grid lg:grid-cols-[1fr_48rem_1fr] pb-8">
-        <div className="col-start-1 col-span-1 md:col-start-2 md:col-span-2">
-          <div className="uppercase text-sm mb-6">
-            {categories?.map((category, index) => {
-              if (typeof category === 'object' && category !== null) {
-                const { title: categoryTitle } = category
-
-                const titleToUse = categoryTitle || 'Untitled category'
-
-                const isLast = index === categories.length - 1
-
-                return (
-                  <React.Fragment key={index}>
-                    {titleToUse}
-                    {!isLast && <React.Fragment>, &nbsp;</React.Fragment>}
-                  </React.Fragment>
-                )
-              }
-              return null
-            })}
-          </div>
-
-          <div className="">
-            <h1 className="mb-6 text-3xl md:text-5xl lg:text-6xl">{title}</h1>
-          </div>
-
-          <div className="flex flex-col md:flex-row gap-4 md:gap-16">
-            {hasAuthors && (
-              <div className="flex flex-col gap-4">
-                <div className="flex flex-col gap-1">
-                  <p className="text-sm">Author</p>
-
-                  <p>{formatAuthors(populatedAuthors)}</p>
-                </div>
-              </div>
-            )}
-            {publishedAt && (
-              <div className="flex flex-col gap-1">
-                <p className="text-sm">Date Published</p>
-
-                <time dateTime={publishedAt}>{formatDateTime(publishedAt)}</time>
-              </div>
-            )}
-          </div>
+    <div className="w-full border-b border-border pb-8 mb-8 flex flex-col gap-6">
+      {/* Categories */}
+      {categories && categories.length > 0 && (
+        <div className="flex flex-wrap gap-2">
+          {categories.map((category, index) => {
+            if (typeof category === 'object' && category !== null) {
+              const { title: categoryTitle } = category
+              const titleToUse = categoryTitle || 'Untitled category'
+              return <Badge key={index}>{titleToUse}</Badge>
+            }
+            return null
+          })}
         </div>
-      </div>
-      <div className="min-h-[80vh] select-none">
-        {heroImage && typeof heroImage !== 'string' && (
-          <Media fill priority imgClassName="-z-10 object-cover" resource={heroImage} />
+      )}
+
+      {/* Title */}
+      <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight tracking-tight">
+        {title}
+      </h1>
+
+      <div className="flex flex-col gap-2">
+        {/* Author */}
+        {hasAuthors && (
+          <p className="text-sm font-medium text-foreground">
+            By {formatAuthors(populatedAuthors)}
+          </p>
         )}
-        <div className="absolute pointer-events-none left-0 bottom-0 w-full h-1/2 bg-gradient-to-t from-black to-transparent" />
+
+        {/* Dates */}
+        {(publishedDate || showUpdated) && (
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-0.5 text-sm text-muted-foreground">
+            {publishedDate && <time dateTime={publishedAt!}>{publishedDate}</time>}
+            {showUpdated && (
+              <time dateTime={updatedAt} className="text-muted-foreground/70">
+                Updated {updatedDate}
+              </time>
+            )}
+          </div>
+        )}
       </div>
+
+      {/* Hero image */}
+      {heroImage && typeof heroImage !== 'string' && (
+        <div className="relative w-full aspect-[16/9] overflow-hidden rounded-md bg-muted">
+          <Media fill priority imgClassName="object-cover" resource={heroImage} />
+        </div>
+      )}
     </div>
   )
 }

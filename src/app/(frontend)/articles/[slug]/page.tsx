@@ -1,5 +1,4 @@
 import type { Metadata } from 'next'
-
 import { RelatedArticles } from '@/blocks/RelatedArticles/Component'
 import { PayloadRedirects } from '@/components/PayloadRedirects'
 import configPromise from '@payload-config'
@@ -7,7 +6,6 @@ import { getPayload } from 'payload'
 import { draftMode } from 'next/headers'
 import React, { cache } from 'react'
 import RichText from '@/components/RichText'
-
 import { ArticleHero } from '@/heros/ArticleHero'
 import { generateMeta } from '@/utilities/generateMeta'
 import PageClient from './page.client'
@@ -25,11 +23,9 @@ export async function generateStaticParams() {
       slug: true,
     },
   })
-
   const params = articles.docs.map(({ slug }) => {
     return { slug }
   })
-
   return params
 }
 
@@ -42,7 +38,6 @@ type Args = {
 export default async function ArticlePage({ params: paramsPromise }: Args) {
   const { isEnabled: draft } = await draftMode()
   const { slug = '' } = await paramsPromise
-  // Decode to support slugs with special characters
   const decodedSlug = decodeURIComponent(slug)
   const url = '/articles/' + decodedSlug
   const article = await queryArticleBySlug({ slug: decodedSlug })
@@ -50,7 +45,7 @@ export default async function ArticlePage({ params: paramsPromise }: Args) {
   if (!article) return <PayloadRedirects url={url} />
 
   return (
-    <article className="pt-16 pb-16">
+    <article className="pt-12 pb-16">
       <PageClient />
 
       {/* Allows redirects for valid pages too */}
@@ -58,39 +53,37 @@ export default async function ArticlePage({ params: paramsPromise }: Args) {
 
       {draft && <LivePreviewListener />}
 
-      <ArticleHero article={article} />
-
-      <div className="flex flex-col items-center gap-4 pt-8">
-        <div className="container">
-          <RichText className="max-w-[48rem] mx-auto" data={article.content} enableGutter={false} />
-          {article.relatedArticles && article.relatedArticles.length > 0 && (
-            <RelatedArticles
-              className="mt-12 max-w-[52rem] lg:grid lg:grid-cols-subgrid col-start-1 col-span-3 grid-rows-[2fr]"
-              docs={article.relatedArticles.filter(
-                (relatedArticle) => typeof relatedArticle === 'object',
-              )}
-            />
-          )}
-        </div>
+      {/* Main content */}
+      <div className="max-w-[48rem] mx-auto px-4 md:px-6">
+        <ArticleHero article={article} />
+        <RichText data={article.content} enableGutter={false} />
       </div>
+
+      {/* Related articles */}
+      {article.relatedArticles && article.relatedArticles.length > 0 && (
+        <div className="mx-4 md:mx-8 lg:mx-12 my-16 py-8 border-t border-border">
+          <h2 className="text-lg font-semibold mb-4">Related Articles</h2>
+          <RelatedArticles
+            docs={article.relatedArticles.filter(
+              (relatedArticle) => typeof relatedArticle === 'object',
+            )}
+          />
+        </div>
+      )}
     </article>
   )
 }
 
 export async function generateMetadata({ params: paramsPromise }: Args): Promise<Metadata> {
   const { slug = '' } = await paramsPromise
-  // Decode to support slugs with special characters
   const decodedSlug = decodeURIComponent(slug)
   const article = await queryArticleBySlug({ slug: decodedSlug })
-
   return generateMeta({ doc: article })
 }
 
 const queryArticleBySlug = cache(async ({ slug }: { slug: string }) => {
   const { isEnabled: draft } = await draftMode()
-
   const payload = await getPayload({ config: configPromise })
-
   const result = await payload.find({
     collection: 'articles',
     draft,
@@ -103,6 +96,5 @@ const queryArticleBySlug = cache(async ({ slug }: { slug: string }) => {
       },
     },
   })
-
   return result.docs?.[0] || null
 })

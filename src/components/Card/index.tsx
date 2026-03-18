@@ -2,13 +2,19 @@
 import { cn } from '@/utilities/ui'
 import useClickableCard from '@/utilities/useClickableCard'
 import Link from 'next/link'
-import React, { Fragment } from 'react'
+import React from 'react'
 
-import type { Article } from '@/payload-types'
+import type { Article, Category } from '@/payload-types'
 
 import { Media } from '@/components/Media'
+import { Badge } from '../ui/badge'
+import { formatAuthors } from '@/utilities/formatAuthors'
+import { formatReadableDate } from '@/utilities/formatReadableDate'
 
-export type CardArticleData = Pick<Article, 'slug' | 'categories' | 'meta' | 'title'>
+export type CardArticleData = Pick<
+  Article,
+  'slug' | 'categories' | 'meta' | 'title' | 'populatedAuthors' | 'publishedAt'
+>
 
 export const Card: React.FC<{
   alignItems?: 'center'
@@ -21,63 +27,73 @@ export const Card: React.FC<{
   const { card, link } = useClickableCard({})
   const { className, doc, relationTo, showCategories, title: titleFromProps } = props
 
-  const { slug, categories, meta, title } = doc || {}
+  const { slug, categories, meta, title, populatedAuthors, publishedAt } = doc || {}
   const { description, image: metaImage } = meta || {}
 
-  const hasCategories = categories && Array.isArray(categories) && categories.length > 0
   const titleToUse = titleFromProps || title
+  const validCategories =
+    categories?.filter(
+      (category): category is Category =>
+        typeof category === 'object' && category !== null && !!category.title,
+    ) ?? []
   const sanitizedDescription = description?.replace(/\s/g, ' ') // replace non-breaking space with white space
+  const author = populatedAuthors?.[0]
   const href = `/${relationTo}/${slug}`
 
   return (
     <article
       className={cn(
-        'border border-border rounded-lg overflow-hidden bg-card hover:bg-accent hover:text-accent-foreground hover:cursor-pointer',
+        'group p-4 rounded-lg overflow-hidden bg-card transition-colors duration-300 hover:bg-accent hover:text-accent-foreground hover:cursor-pointer',
         className,
       )}
       ref={card.ref}
     >
-      <div className="relative w-full ">
-        {!metaImage && <div className="">No image</div>}
-        {metaImage && typeof metaImage !== 'string' && <Media resource={metaImage} size="33vw" />}
-      </div>
-      <div className="p-4">
-        {showCategories && hasCategories && (
-          <div className="uppercase text-sm mb-4">
-            {showCategories && hasCategories && (
-              <div>
-                {categories?.map((category, index) => {
-                  if (typeof category === 'object') {
-                    const { title: titleFromCategory } = category
-
-                    const categoryTitle = titleFromCategory || 'Untitled category'
-
-                    const isLast = index === categories.length - 1
-
-                    return (
-                      <Fragment key={index}>
-                        {categoryTitle}
-                        {!isLast && <Fragment>, &nbsp;</Fragment>}
-                      </Fragment>
-                    )
-                  }
-
-                  return null
-                })}
-              </div>
-            )}
-          </div>
-        )}
+      {/* Meta image */}
+      {metaImage && typeof metaImage !== 'string' && (
+        <div className="mb-4 rounded-lg w-full aspect-[16/9] overflow-hidden">
+          <Media
+            resource={metaImage}
+            size="33vw"
+            className="w-full h-full object-cover transition-transform duration-300 ease-out group-hover:scale-110"
+          />
+        </div>
+      )}
+      <div>
+        {/* Title */}
         {titleToUse && (
           <div className="prose">
-            <h3>
+            <h3 className="line-clamp-2">
               <Link className="not-prose" href={href} ref={link.ref}>
                 {titleToUse}
               </Link>
             </h3>
           </div>
         )}
-        {description && <div className="mt-2">{description && <p>{sanitizedDescription}</p>}</div>}
+
+        {/* Categories */}
+        {showCategories && validCategories.length > 0 && (
+          <div className="flex flex-wrap gap-1 text-sm my-2">
+            {validCategories.map((category) => (
+              <Badge key={category.id} variant="outline">
+                {category.title}
+              </Badge>
+            ))}
+          </div>
+        )}
+
+        <div className="text-xs text-muted-foreground flex flex-wrap gap-3 my-2">
+          {/* Author */}
+          {author && <div className="font-medium">{formatAuthors(populatedAuthors)}</div>}
+          {/* Date */}
+          {publishedAt && <div>{formatReadableDate(publishedAt)}</div>}
+        </div>
+
+        {/* Description */}
+        {sanitizedDescription && (
+          <div className="line-clamp-3 mt-2">
+            <p>{sanitizedDescription}</p>
+          </div>
+        )}
       </div>
     </article>
   )
