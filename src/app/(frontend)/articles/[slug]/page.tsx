@@ -39,7 +39,7 @@ export default async function ArticlePage({ params: paramsPromise }: Args) {
   const { isEnabled: draft } = await draftMode()
   const { slug = '' } = await paramsPromise
   const decodedSlug = decodeURIComponent(slug)
-  const url = '/articles/' + decodedSlug
+  const url = `/articles/${decodedSlug}`
   const article = await queryArticleBySlug({ slug: decodedSlug })
 
   if (!article) return <PayloadRedirects url={url} />
@@ -56,6 +56,7 @@ export default async function ArticlePage({ params: paramsPromise }: Args) {
       {/* Main content */}
       <div className="max-w-[48rem] mx-auto px-4 md:px-6">
         <ArticleHero article={article} />
+
         <RichText data={article.content} enableGutter={false} />
       </div>
 
