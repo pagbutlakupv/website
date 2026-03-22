@@ -6,6 +6,7 @@ import type { Article } from '@/payload-types'
 
 import { Card } from '../../components/Card'
 import { DefaultTypedEditorState } from '@payloadcms/richtext-lexical'
+import { toCardArticleData } from '@/utilities/articleCardData'
 
 export type RelatedArticlesProps = {
   className?: string
@@ -24,7 +25,7 @@ export const RelatedArticles: React.FC<RelatedArticlesProps> = (props) => {
         {docs?.map((doc, index) => {
           if (typeof doc === 'string') return null
 
-          return <Card key={index} doc={doc} relationTo="articles" />
+          return <Card key={index} doc={toCardArticleData(doc)} relationTo="articles" />
         })}
       </div>
     </div>
