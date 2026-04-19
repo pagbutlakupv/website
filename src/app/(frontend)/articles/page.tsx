@@ -23,6 +23,7 @@ export default async function Page() {
       title: true,
       slug: true,
       categories: true,
+      content: true,
       meta: true,
       publishedAt: true,
       authors: true,

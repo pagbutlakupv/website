@@ -841,6 +841,14 @@ export interface Search {
     value: number | Article;
   };
   slug?: string | null;
+  publishedAt?: string | null;
+  populatedAuthors?:
+    | {
+        name?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  readingTimeMinutes?: number | null;
   meta?: {
     title?: string | null;
     description?: string | null;
@@ -1533,6 +1541,14 @@ export interface SearchSelect<T extends boolean = true> {
   priority?: T;
   doc?: T;
   slug?: T;
+  publishedAt?: T;
+  populatedAuthors?:
+    | T
+    | {
+        name?: T;
+        id?: T;
+      };
+  readingTimeMinutes?: T;
   meta?:
     | T
     | {

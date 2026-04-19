@@ -4,6 +4,7 @@ import { Media } from '@/components/Media'
 import { formatAuthors } from '@/utilities/formatAuthors'
 import { formatReadableDate } from '@/utilities/formatReadableDate'
 import { Badge } from '@/components/ui/badge'
+import { formatReadingTime, getReadingTimeMinutes } from '@/utilities/readingTime'
 
 export const ArticleHero: React.FC<{
   article: Article
@@ -15,6 +16,7 @@ export const ArticleHero: React.FC<{
 
   const publishedDate = publishedAt ? formatReadableDate(publishedAt) : null
   const updatedDate = updatedAt ? formatReadableDate(updatedAt) : null
+  const readingTimeLabel = formatReadingTime(getReadingTimeMinutes(article.content))
   const showUpdated = updatedDate && updatedDate !== publishedDate
 
   return (
@@ -47,9 +49,10 @@ export const ArticleHero: React.FC<{
         )}
 
         {/* Dates */}
-        {(publishedDate || showUpdated) && (
+        {(publishedDate || readingTimeLabel || showUpdated) && (
           <div className="flex flex-wrap items-center gap-x-4 gap-y-0.5 text-sm text-muted-foreground">
             {publishedDate && <time dateTime={publishedAt!}>{publishedDate}</time>}
+            {readingTimeLabel && <div>{readingTimeLabel}</div>}
             {showUpdated && (
               <time dateTime={updatedAt} className="text-muted-foreground/70">
                 Updated {updatedDate}
