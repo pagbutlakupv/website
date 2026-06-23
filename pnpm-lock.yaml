@@ -107,9 +107,6 @@ importers:
       sharp:
         specifier: 0.34.2
         version: 0.34.2
-      storage‑s3:
-        specifier: link:@payloadcms/storage‑s3
-        version: link:@payloadcms/storage‑s3
       tailwind-merge:
         specifier: ^2.6.1
         version: 2.6.1
