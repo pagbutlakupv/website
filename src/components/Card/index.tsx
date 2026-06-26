@@ -4,17 +4,12 @@ import useClickableCard from '@/utilities/useClickableCard'
 import Link from 'next/link'
 import React from 'react'
 
-import type { Article, Category } from '@/payload-types'
-
 import { Media } from '@/components/Media'
 import { Badge } from '../ui/badge'
 import { formatAuthors } from '@/utilities/formatAuthors'
 import { formatReadableDate } from '@/utilities/formatReadableDate'
-
-export type CardArticleData = Pick<
-  Article,
-  'slug' | 'categories' | 'meta' | 'title' | 'populatedAuthors' | 'publishedAt'
->
+import { formatReadingTime } from '@/utilities/readingTime'
+import type { CardArticleData } from '@/utilities/articleCardData'
 
 export const Card: React.FC<{
   alignItems?: 'center'
@@ -27,17 +22,14 @@ export const Card: React.FC<{
   const { card, link } = useClickableCard({})
   const { className, doc, relationTo, showCategories, title: titleFromProps } = props
 
-  const { slug, categories, meta, title, populatedAuthors, publishedAt } = doc || {}
+  const { slug, categories, meta, title, populatedAuthors, publishedAt, readingTimeMinutes } =
+    doc || {}
   const { description, image: metaImage } = meta || {}
 
   const titleToUse = titleFromProps || title
-  const validCategories =
-    categories?.filter(
-      (category): category is Category =>
-        typeof category === 'object' && category !== null && !!category.title,
-    ) ?? []
   const sanitizedDescription = description?.replace(/\s/g, ' ') // replace non-breaking space with white space
-  const author = populatedAuthors?.[0]
+  const authorLabel = populatedAuthors ? formatAuthors(populatedAuthors) : ''
+  const readingTimeLabel = formatReadingTime(readingTimeMinutes)
   const href = `/${relationTo}/${slug}`
 
   return (
@@ -71,9 +63,9 @@ export const Card: React.FC<{
         )}
 
         {/* Categories */}
-        {showCategories && validCategories.length > 0 && (
+        {showCategories && categories && categories.length > 0 && (
           <div className="flex flex-wrap gap-1 text-sm my-2">
-            {validCategories.map((category) => (
+            {categories.map((category) => (
               <Badge key={category.id} variant="outline">
                 {category.title}
               </Badge>
@@ -83,9 +75,11 @@ export const Card: React.FC<{
 
         <div className="text-xs text-muted-foreground flex flex-wrap gap-3 my-2">
           {/* Author */}
-          {author && <div className="font-medium">{formatAuthors(populatedAuthors)}</div>}
+          {authorLabel && <div className="font-medium">{authorLabel}</div>}
           {/* Date */}
           {publishedAt && <div>{formatReadableDate(publishedAt)}</div>}
+          {/* Reading time */}
+          {readingTimeLabel && <div>{readingTimeLabel}</div>}
         </div>
 
         {/* Description */}

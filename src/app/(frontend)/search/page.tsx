@@ -6,7 +6,7 @@ import { getPayload } from 'payload'
 import React from 'react'
 import { Search } from '@/search/Component'
 import PageClient from './page.client'
-import { CardArticleData } from '@/components/Card'
+import { CardSearchSource } from '@/utilities/articleCardData'
 
 type Args = {
   searchParams: Promise<{
@@ -27,8 +27,8 @@ export default async function Page({ searchParams: searchParamsPromise }: Args) 
       categories: true,
       meta: true,
       publishedAt: true,
-      authors: true,
       populatedAuthors: true,
+      readingTimeMinutes: true,
     },
     // pagination: false reduces overhead if you don't need totalDocs
     pagination: false,
@@ -76,7 +76,7 @@ export default async function Page({ searchParams: searchParamsPromise }: Args) 
       </div>
 
       {articles.totalDocs > 0 ? (
-        <CollectionArchive articles={articles.docs as CardArticleData[]} />
+        <CollectionArchive articles={articles.docs as CardSearchSource[]} />
       ) : (
         <div className="container">No results found.</div>
       )}
