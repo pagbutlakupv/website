@@ -33,7 +33,6 @@ export async function SectionArchive({ section, sectionLabel, page = 1 }: Props)
       meta: true,
       publishedAt: true,
       authors: true,
-      populatedAuthors: true,
     },
   })
 
