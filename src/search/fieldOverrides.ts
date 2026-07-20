@@ -10,6 +10,16 @@ export const searchFields: Field[] = [
     },
   },
   {
+    label: 'Authors',
+    name: 'authors',
+    type: 'relationship',
+    relationTo: 'authors',
+    hasMany: true,
+    admin: {
+      readOnly: true,
+    },
+  },
+  {
     name: 'meta',
     label: 'Meta',
     type: 'group',

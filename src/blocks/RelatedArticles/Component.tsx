@@ -4,7 +4,7 @@ import RichText from '@/components/RichText'
 
 import type { Article } from '@/payload-types'
 
-import { Card } from '../../components/Card'
+import { Card } from '../../components/Articles/Card'
 import { DefaultTypedEditorState } from '@payloadcms/richtext-lexical'
 
 export type RelatedArticlesProps = {

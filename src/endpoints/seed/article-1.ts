@@ -1,10 +1,10 @@
-import type { Media, User } from '@/payload-types'
+import type { Media, Author } from '@/payload-types'
 import { RequiredDataFromCollectionSlug } from 'payload'
 
 export type ArticleArgs = {
   heroImage: Media
   blockImage: Media
-  author: User
+  author: Author
 }
 
 export const article1: (args: ArticleArgs) => RequiredDataFromCollectionSlug<'articles'> = ({

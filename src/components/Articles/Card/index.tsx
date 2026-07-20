@@ -7,13 +7,13 @@ import React from 'react'
 import type { Article, Category } from '@/payload-types'
 
 import { Media } from '@/components/Media'
-import { Badge } from '../ui/badge'
+import { Badge } from '../../ui/badge'
 import { formatAuthors } from '@/utilities/formatAuthors'
 import { formatReadableDate } from '@/utilities/formatReadableDate'
 
 export type CardArticleData = Pick<
   Article,
-  'slug' | 'categories' | 'meta' | 'title' | 'populatedAuthors' | 'publishedAt'
+  'slug' | 'categories' | 'meta' | 'title' | 'authors' | 'publishedAt'
 >
 
 export const Card: React.FC<{
@@ -27,7 +27,7 @@ export const Card: React.FC<{
   const { card, link } = useClickableCard({})
   const { className, doc, relationTo, showCategories, title: titleFromProps } = props
 
-  const { slug, categories, meta, title, populatedAuthors, publishedAt } = doc || {}
+  const { slug, categories, meta, title, authors, publishedAt } = doc || {}
   const { description, image: metaImage } = meta || {}
 
   const titleToUse = titleFromProps || title
@@ -37,7 +37,7 @@ export const Card: React.FC<{
         typeof category === 'object' && category !== null && !!category.title,
     ) ?? []
   const sanitizedDescription = description?.replace(/\s/g, ' ') // replace non-breaking space with white space
-  const author = populatedAuthors?.[0]
+  const author = authors?.[0]
   const href = `/${relationTo}/${slug}`
 
   return (
@@ -83,7 +83,7 @@ export const Card: React.FC<{
 
         <div className="text-xs text-muted-foreground flex flex-wrap gap-3 my-2">
           {/* Author */}
-          {author && <div className="font-medium">{formatAuthors(populatedAuthors)}</div>}
+          {author && <div className="font-medium">{formatAuthors(authors)}</div>}
           {/* Date */}
           {publishedAt && <div>{formatReadableDate(publishedAt)}</div>}
         </div>

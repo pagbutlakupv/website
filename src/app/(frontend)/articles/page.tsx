@@ -26,7 +26,6 @@ export default async function Page() {
       meta: true,
       publishedAt: true,
       authors: true,
-      populatedAuthors: true,
     },
   })
 

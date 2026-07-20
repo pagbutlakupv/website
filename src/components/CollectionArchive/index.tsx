@@ -1,7 +1,7 @@
 import { cn } from '@/utilities/ui'
 import React from 'react'
 
-import { Card, CardArticleData } from '@/components/Card'
+import { Card, CardArticleData } from '@/components/Articles/Card'
 
 export type Props = {
   articles: CardArticleData[]

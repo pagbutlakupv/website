@@ -13,6 +13,7 @@ const collections: CollectionSlug[] = [
   'media',
   'pages',
   'articles',
+  'authors',
   'forms',
   'form-submissions',
   'search',
@@ -83,12 +84,12 @@ export const seed = async ({
 
   const image = loadLocalFile('image.jpg')
 
-  const [demoAuthor, imageDoc] = await Promise.all([
+  const [demoUser, imageDoc] = await Promise.all([
     payload.create({
       collection: 'users',
       data: {
-        name: 'Demo Author',
-        email: 'demo-author@example.com',
+        name: 'Demo User',
+        email: 'demo-user@example.com',
         password: 'demo-password',
       },
     }),
@@ -108,6 +109,41 @@ export const seed = async ({
     ),
   ])
 
+  payload.logger.info(`— Seeding authors...`)
+
+  const [author1, author2] = await Promise.all([
+    payload.create({
+      collection: 'authors',
+      data: {
+        name: 'Juan Dela Cruz',
+        role: 'Editor-in-Chief',
+        bio: 'Juan oversees the editorial direction of the publication.',
+        avatar: imageDoc.id,
+        socialLinks: {
+          website: 'https://example.com',
+          facebook: 'https://facebook.com/juan',
+          linkedin: 'https://linkedin.com/in/juan',
+        },
+        slug: 'juan-dela-cruz',
+      },
+    }),
+
+    payload.create({
+      collection: 'authors',
+      data: {
+        name: 'Maria Santos',
+        role: 'Staff Writer',
+        bio: 'Maria covers technology and campus news.',
+        avatar: imageDoc.id,
+        socialLinks: {
+          x: 'https://x.com/maria',
+          instagram: 'https://instagram.com/maria',
+        },
+        slug: 'maria-santos',
+      },
+    }),
+  ])
+
   payload.logger.info(`— Seeding articles...`)
 
   // Do not create articles with `Promise.all` because we want the articles to be created in order
@@ -118,7 +154,7 @@ export const seed = async ({
     context: {
       disableRevalidate: true,
     },
-    data: article1({ heroImage: imageDoc, blockImage: imageDoc, author: demoAuthor }),
+    data: article1({ heroImage: imageDoc, blockImage: imageDoc, author: author1 }),
   })
 
   const article2Doc = await payload.create({
@@ -127,7 +163,7 @@ export const seed = async ({
     context: {
       disableRevalidate: true,
     },
-    data: article2({ heroImage: imageDoc, blockImage: imageDoc, author: demoAuthor }),
+    data: article2({ heroImage: imageDoc, blockImage: imageDoc, author: author2 }),
   })
 
   const article3Doc = await payload.create({
@@ -136,7 +172,7 @@ export const seed = async ({
     context: {
       disableRevalidate: true,
     },
-    data: article3({ heroImage: imageDoc, blockImage: imageDoc, author: demoAuthor }),
+    data: article3({ heroImage: imageDoc, blockImage: imageDoc, author: author1 }),
   })
 
   // update each article with related articles

@@ -10,6 +10,7 @@ import { ArticleHero } from '@/heros/ArticleHero'
 import { generateMeta } from '@/utilities/generateMeta'
 import PageClient from './page.client'
 import { LivePreviewListener } from '@/components/LivePreviewListener'
+import { AuthorPreviewCard } from '@/components/Authors/PreviewCard'
 
 export async function generateStaticParams() {
   const payload = await getPayload({ config: configPromise })
@@ -56,7 +57,19 @@ export default async function ArticlePage({ params: paramsPromise }: Args) {
       {/* Main content */}
       <div className="max-w-[48rem] mx-auto px-4 md:px-6">
         <ArticleHero article={article} />
+
         <RichText data={article.content} enableGutter={false} />
+
+        <hr className="my-12 border-border" />
+
+        {/* Authors */}
+        <div className="space-y-4">
+          {article.authors?.map((author) => {
+            if (typeof author === 'number') return null
+
+            return <AuthorPreviewCard key={author.id} doc={author} />
+          })}
+        </div>
       </div>
 
       {/* Related articles */}

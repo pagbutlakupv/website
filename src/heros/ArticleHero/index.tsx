@@ -8,10 +8,9 @@ import { Badge } from '@/components/ui/badge'
 export const ArticleHero: React.FC<{
   article: Article
 }> = ({ article }) => {
-  const { categories, heroImage, populatedAuthors, publishedAt, updatedAt, title } = article
+  const { categories, heroImage, authors, publishedAt, updatedAt, title } = article
 
-  const hasAuthors =
-    populatedAuthors && populatedAuthors.length > 0 && formatAuthors(populatedAuthors) !== ''
+  const hasAuthors = authors && authors.length > 0 && formatAuthors(authors) !== ''
 
   const publishedDate = publishedAt ? formatReadableDate(publishedAt) : null
   const updatedDate = updatedAt ? formatReadableDate(updatedAt) : null
@@ -41,9 +40,7 @@ export const ArticleHero: React.FC<{
       <div className="flex flex-col gap-2">
         {/* Author */}
         {hasAuthors && (
-          <p className="text-sm font-medium text-foreground">
-            By {formatAuthors(populatedAuthors)}
-          </p>
+          <p className="text-sm font-medium text-foreground">By {formatAuthors(authors)}</p>
         )}
 
         {/* Dates */}
