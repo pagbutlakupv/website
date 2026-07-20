@@ -31,7 +31,12 @@ const eslintConfig = [
     },
   },
   {
-    ignores: ['.next/'],
+    ignores: [
+      '.next/',
+      'next-env.d.ts',
+      'src/payload-types.ts',
+      'src/app/(payload)/admin/importMap.js',
+    ],
   },
 ]
 

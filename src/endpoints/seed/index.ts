@@ -2,9 +2,9 @@ import type { CollectionSlug, GlobalSlug, Payload, PayloadRequest, File } from '
 
 import { home } from './home'
 import { image1 } from './image'
-import { post1 } from './post-1'
-import { post2 } from './post-2'
-import { post3 } from './post-3'
+import { article1 } from './article-1'
+import { article2 } from './article-2'
+import { article3 } from './article-3'
 import path from 'path'
 import fs from 'fs'
 
@@ -12,7 +12,8 @@ const collections: CollectionSlug[] = [
   'categories',
   'media',
   'pages',
-  'posts',
+  'articles',
+  'authors',
   'forms',
   'form-submissions',
   'search',
@@ -83,12 +84,12 @@ export const seed = async ({
 
   const image = loadLocalFile('image.jpg')
 
-  const [demoAuthor, imageDoc] = await Promise.all([
+  const [demoUser, imageDoc] = await Promise.all([
     payload.create({
       collection: 'users',
       data: {
-        name: 'Demo Author',
-        email: 'demo-author@example.com',
+        name: 'Demo User',
+        email: 'demo-user@example.com',
         password: 'demo-password',
       },
     }),
@@ -108,57 +109,92 @@ export const seed = async ({
     ),
   ])
 
-  payload.logger.info(`— Seeding posts...`)
+  payload.logger.info(`— Seeding authors...`)
 
-  // Do not create posts with `Promise.all` because we want the posts to be created in order
+  const [author1, author2] = await Promise.all([
+    payload.create({
+      collection: 'authors',
+      data: {
+        name: 'Juan Dela Cruz',
+        role: 'Editor-in-Chief',
+        bio: 'Juan oversees the editorial direction of the publication.',
+        avatar: imageDoc.id,
+        socialLinks: {
+          website: 'https://example.com',
+          facebook: 'https://facebook.com/juan',
+          linkedin: 'https://linkedin.com/in/juan',
+        },
+        slug: 'juan-dela-cruz',
+      },
+    }),
+
+    payload.create({
+      collection: 'authors',
+      data: {
+        name: 'Maria Santos',
+        role: 'Staff Writer',
+        bio: 'Maria covers technology and campus news.',
+        avatar: imageDoc.id,
+        socialLinks: {
+          x: 'https://x.com/maria',
+          instagram: 'https://instagram.com/maria',
+        },
+        slug: 'maria-santos',
+      },
+    }),
+  ])
+
+  payload.logger.info(`— Seeding articles...`)
+
+  // Do not create articles with `Promise.all` because we want the articles to be created in order
   // This way we can sort them by `createdAt` or `publishedAt` and they will be in the expected order
-  const post1Doc = await payload.create({
-    collection: 'posts',
+  const article1Doc = await payload.create({
+    collection: 'articles',
     depth: 0,
     context: {
       disableRevalidate: true,
     },
-    data: post1({ heroImage: imageDoc, blockImage: imageDoc, author: demoAuthor }),
+    data: article1({ heroImage: imageDoc, blockImage: imageDoc, author: author1 }),
   })
 
-  const post2Doc = await payload.create({
-    collection: 'posts',
+  const article2Doc = await payload.create({
+    collection: 'articles',
     depth: 0,
     context: {
       disableRevalidate: true,
     },
-    data: post2({ heroImage: imageDoc, blockImage: imageDoc, author: demoAuthor }),
+    data: article2({ heroImage: imageDoc, blockImage: imageDoc, author: author2 }),
   })
 
-  const post3Doc = await payload.create({
-    collection: 'posts',
+  const article3Doc = await payload.create({
+    collection: 'articles',
     depth: 0,
     context: {
       disableRevalidate: true,
     },
-    data: post3({ heroImage: imageDoc, blockImage: imageDoc, author: demoAuthor }),
+    data: article3({ heroImage: imageDoc, blockImage: imageDoc, author: author1 }),
   })
 
-  // update each post with related posts
+  // update each article with related articles
   await payload.update({
-    id: post1Doc.id,
-    collection: 'posts',
+    id: article1Doc.id,
+    collection: 'articles',
     data: {
-      relatedPosts: [post2Doc.id, post3Doc.id],
+      relatedArticles: [article2Doc.id, article3Doc.id],
     },
   })
   await payload.update({
-    id: post2Doc.id,
-    collection: 'posts',
+    id: article2Doc.id,
+    collection: 'articles',
     data: {
-      relatedPosts: [post1Doc.id, post3Doc.id],
+      relatedArticles: [article1Doc.id, article3Doc.id],
     },
   })
   await payload.update({
-    id: post3Doc.id,
-    collection: 'posts',
+    id: article3Doc.id,
+    collection: 'articles',
     data: {
-      relatedPosts: [post1Doc.id, post2Doc.id],
+      relatedArticles: [article1Doc.id, article2Doc.id],
     },
   })
 
@@ -182,8 +218,29 @@ export const seed = async ({
           {
             link: {
               type: 'custom',
-              label: 'Posts',
-              url: '/posts',
+              label: 'News',
+              url: '/news',
+            },
+          },
+          {
+            link: {
+              type: 'custom',
+              label: 'Opinion',
+              url: '/opinion',
+            },
+          },
+          {
+            link: {
+              type: 'custom',
+              label: 'Features',
+              url: '/features',
+            },
+          },
+          {
+            link: {
+              type: 'custom',
+              label: 'Kultura',
+              url: '/kultura',
             },
           },
         ],

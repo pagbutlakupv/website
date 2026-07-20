@@ -2,7 +2,7 @@ import { notFound } from 'next/navigation'
 import { Logo } from '@/components/brand/Logo'
 import { Wordmark } from '@/components/brand/Wordmark'
 import { Button } from '@/components/ui/button'
-import { Card } from '@/components/Card'
+import { Card } from '@/components/Articles/Card'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -25,6 +25,17 @@ export default function Page() {
   // Prevent access in production
   if (process.env.NODE_ENV === 'production') {
     notFound()
+  }
+
+  const mockAuthor = {
+    id: 1,
+    name: 'Juan Dela Cruz',
+    slug: 'juan-dela-cruz',
+    role: 'Staff Writer',
+    bio: 'Lorem ipsum dolor sit amet.',
+    avatar: null,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
   }
 
   return (
@@ -97,33 +108,37 @@ export default function Page() {
       {/* Cards */}
       <section className="mb-12">
         <h2 className="text-xl font-bold mb-4">Cards</h2>
-
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
           <Card
             doc={{
               slug: 'card-1',
               title: 'Card 1',
               meta: { description: 'This is the first card.' },
+              authors: [mockAuthor],
             }}
-            relationTo="posts"
+            relationTo="articles"
           />
+
           <Card
             doc={{
               slug: 'card-2',
               title: 'Card 2',
               meta: { description: 'This is the second card.' },
+              authors: [mockAuthor],
             }}
-            relationTo="posts"
+            relationTo="articles"
           />
+
           <Card
             doc={{
               slug: 'card-3',
               title: 'Card 3',
               meta: { description: 'This is the third card.' },
+              authors: [mockAuthor],
             }}
-            relationTo="posts"
+            relationTo="articles"
           />
-        </div>
+        </div>{' '}
       </section>
 
       {/* Inputs */}
