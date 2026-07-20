@@ -7,7 +7,13 @@ services:
       - .:/home/node/app
       - node_modules:/home/node/app/node_modules
     working_dir: /home/node/app/
-    command: sh -c "corepack enable pnpm && pnpm install --frozen-lockfile && pnpm dev"
+    command: >
+      sh -c "
+      corepack enable &&
+      corepack prepare pnpm@10.0.0 --activate &&
+      pnpm install &&
+      pnpm dev
+      "
     depends_on:
       - postgres
     env_file:
