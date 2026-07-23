@@ -4,22 +4,64 @@ import useClickableCard from '@/utilities/useClickableCard'
 import Link from 'next/link'
 import React from 'react'
 
-import type { Article, Category } from '@/payload-types'
-
 import { Media } from '@/components/Media'
 import { Badge } from '../../ui/badge'
 import { formatAuthors } from '@/utilities/formatAuthors'
 import { formatReadableDate } from '@/utilities/formatReadableDate'
+import { formatReadingTime } from '@/utilities/readingTime'
+import type { Article, Search } from '@/payload-types'
 
-export type CardArticleData = Pick<
+type CardAuthorData = NonNullable<NonNullable<Article['authors']>[number]>
+
+export type CardCategoryData = {
+  id: string | number
+  title: string
+}
+
+export type ArticleCardDoc = Pick<
   Article,
-  'slug' | 'categories' | 'meta' | 'title' | 'authors' | 'publishedAt'
+  'slug' | 'categories' | 'meta' | 'title' | 'authors' | 'publishedAt' | 'readingTimeMinutes'
 >
+
+export type SearchCardDoc = Pick<Search, 'slug' | 'categories' | 'meta' | 'title'> & {
+  publishedAt?: string | null
+  authors?: CardAuthorData[] | null
+  readingTimeMinutes?: number | null
+}
+
+export type CardDoc = ArticleCardDoc | SearchCardDoc
+
+const normalizeCategories = (
+  categories: Article['categories'] | Search['categories'],
+): CardCategoryData[] => {
+  const normalizedCategories: CardCategoryData[] = []
+
+  categories?.forEach((category) => {
+    if (!category || typeof category !== 'object' || !category.title) {
+      return
+    }
+
+    if ('categoryID' in category) {
+      normalizedCategories.push({
+        id: category.categoryID || category.id || category.title,
+        title: category.title,
+      })
+      return
+    }
+
+    normalizedCategories.push({
+      id: category.id ?? category.title,
+      title: category.title,
+    })
+  })
+
+  return normalizedCategories
+}
 
 export const Card: React.FC<{
   alignItems?: 'center'
   className?: string
-  doc?: CardArticleData
+  doc?: CardDoc
   relationTo?: 'articles'
   showCategories?: boolean
   title?: string
@@ -27,17 +69,15 @@ export const Card: React.FC<{
   const { card, link } = useClickableCard({})
   const { className, doc, relationTo, showCategories, title: titleFromProps } = props
 
-  const { slug, categories, meta, title, authors, publishedAt } = doc || {}
+  const { slug, meta, title, authors, publishedAt, readingTimeMinutes } = doc || {}
+
+  const categories = doc ? normalizeCategories(doc.categories) : []
   const { description, image: metaImage } = meta || {}
 
   const titleToUse = titleFromProps || title
-  const validCategories =
-    categories?.filter(
-      (category): category is Category =>
-        typeof category === 'object' && category !== null && !!category.title,
-    ) ?? []
   const sanitizedDescription = description?.replace(/\s/g, ' ') // replace non-breaking space with white space
-  const author = authors?.[0]
+  const authorLabel = authors ? formatAuthors(authors) : ''
+  const readingTimeLabel = formatReadingTime(readingTimeMinutes)
   const href = `/${relationTo}/${slug}`
 
   return (
@@ -71,9 +111,9 @@ export const Card: React.FC<{
         )}
 
         {/* Categories */}
-        {showCategories && validCategories.length > 0 && (
+        {showCategories && categories && categories.length > 0 && (
           <div className="flex flex-wrap gap-1 text-sm my-2">
-            {validCategories.map((category) => (
+            {categories.map((category) => (
               <Badge key={category.id} variant="outline">
                 {category.title}
               </Badge>
@@ -83,9 +123,11 @@ export const Card: React.FC<{
 
         <div className="text-xs text-muted-foreground flex flex-wrap gap-3 my-2">
           {/* Author */}
-          {author && <div className="font-medium">{formatAuthors(authors)}</div>}
+          {authorLabel && <div className="font-medium">{authorLabel}</div>}
           {/* Date */}
           {publishedAt && <div>{formatReadableDate(publishedAt)}</div>}
+          {/* Reading time */}
+          {readingTimeLabel && <div>{readingTimeLabel}</div>}
         </div>
 
         {/* Description */}

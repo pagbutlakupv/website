@@ -258,6 +258,7 @@ export interface Article {
   };
   publishedAt?: string | null;
   authors: (number | Author)[];
+  readingTimeMinutes?: number | null;
   /**
    * When enabled, the slug will auto-generate from the title field on save and autosave.
    */
@@ -862,6 +863,8 @@ export interface Search {
   };
   slug?: string | null;
   authors?: (number | Author)[] | null;
+  publishedAt?: string | null;
+  readingTimeMinutes?: number | null;
   meta?: {
     title?: string | null;
     description?: string | null;
@@ -1235,6 +1238,7 @@ export interface ArticlesSelect<T extends boolean = true> {
       };
   publishedAt?: T;
   authors?: T;
+  readingTimeMinutes?: T;
   generateSlug?: T;
   slug?: T;
   updatedAt?: T;
@@ -1576,6 +1580,8 @@ export interface SearchSelect<T extends boolean = true> {
   doc?: T;
   slug?: T;
   authors?: T;
+  publishedAt?: T;
+  readingTimeMinutes?: T;
   meta?:
     | T
     | {

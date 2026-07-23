@@ -15,6 +15,7 @@ import { Banner } from '../../blocks/Banner/config'
 import { Code } from '../../blocks/Code/config'
 import { MediaBlock } from '../../blocks/MediaBlock/config'
 import { generatePreviewPath } from '../../utilities/generatePreviewPath'
+import { getReadingTimeMinutes } from '../../utilities/readingTime'
 import { revalidateArticle, revalidateDelete } from './hooks/revalidateArticle'
 
 import {
@@ -43,6 +44,7 @@ export const Articles: CollectionConfig<'articles'> = {
     title: true,
     slug: true,
     categories: true,
+    readingTimeMinutes: true,
     meta: {
       image: true,
       description: true,
@@ -199,6 +201,21 @@ export const Articles: CollectionConfig<'articles'> = {
       hasMany: true,
       relationTo: 'authors',
       required: true,
+    },
+    {
+      name: 'readingTimeMinutes',
+      type: 'number',
+      admin: {
+        readOnly: true,
+        position: 'sidebar',
+      },
+      hooks: {
+        beforeChange: [
+          ({ data }) => {
+            return getReadingTimeMinutes(data?.content)
+          },
+        ],
+      },
     },
     slugField(),
   ],

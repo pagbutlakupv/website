@@ -103,6 +103,21 @@ const queryArticleBySlug = cache(async ({ slug }: { slug: string }) => {
     limit: 1,
     overrideAccess: draft,
     pagination: false,
+    select: {
+      title: true,
+      slug: true,
+      section: true,
+      heroImage: true,
+      content: true,
+      relatedArticles: true,
+      categories: true,
+      meta: true,
+      publishedAt: true,
+      authors: true,
+      readingTimeMinutes: true,
+      updatedAt: true,
+      createdAt: true,
+    },
     where: {
       slug: {
         equals: slug,

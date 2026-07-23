@@ -20,6 +20,22 @@ export const searchFields: Field[] = [
     },
   },
   {
+    name: 'publishedAt',
+    type: 'date',
+    index: true,
+    admin: {
+      readOnly: true,
+    },
+  },
+  {
+    name: 'readingTimeMinutes',
+    type: 'number',
+    index: true,
+    admin: {
+      readOnly: true,
+    },
+  },
+  {
     name: 'meta',
     label: 'Meta',
     type: 'group',
