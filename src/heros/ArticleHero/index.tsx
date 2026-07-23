@@ -4,17 +4,20 @@ import { Media } from '@/components/Media'
 import { formatAuthors } from '@/utilities/formatAuthors'
 import { formatReadableDate } from '@/utilities/formatReadableDate'
 import { Badge } from '@/components/ui/badge'
+import { SocialMediaShare } from '@/components/SocialMediaShare'
+import { getServerSideURL } from '@/utilities/getURL'
 
 export const ArticleHero: React.FC<{
   article: Article
 }> = ({ article }) => {
-  const { categories, heroImage, authors, publishedAt, updatedAt, title } = article
+  const { categories, heroImage, authors, publishedAt, slug, updatedAt, title } = article
 
   const hasAuthors = authors && authors.length > 0 && formatAuthors(authors) !== ''
 
   const publishedDate = publishedAt ? formatReadableDate(publishedAt) : null
   const updatedDate = updatedAt ? formatReadableDate(updatedAt) : null
   const showUpdated = updatedDate && updatedDate !== publishedDate
+  const shareURL = `${getServerSideURL()}/articles/${slug}`
 
   return (
     <div className="w-full border-b border-border pb-8 mb-8 flex flex-col gap-6">
@@ -54,6 +57,8 @@ export const ArticleHero: React.FC<{
             )}
           </div>
         )}
+
+        <SocialMediaShare title={title} url={shareURL} />
       </div>
 
       {/* Hero image */}
